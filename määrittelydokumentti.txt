@@ -1,0 +1,24 @@
+
+- Aion käyttää C++ kieltä
+- Osaan käyttää kieliä: python, C, C++, C#, FORTRAN
+
+- Algoritmeja joita suunnittelen käyttäväni:
+	- minimax algoritmi
+	- alpha beta pruning
+	- yksinkertainen arvostelu shakkilaudan "pisteytykselle"
+
+- Pyrin tekemään shakkitietokoneen joka osaa tarpeeksi hyvin pelata peliä ja toimii
+- Syötteenä ohjelma saa jonkun sattumanvaraisen shakki tilanteen, mahdollisen tai mahdottoman
+  ja osaa sen perusteella ehdottaa seuraavaa siirtoa sille pelaajalle kenen vuoro on
+- Suorityskyky tavoiteet ovat tehdä tietenkin ohjelmasta madollisimman nopea, mutta myös jokin
+  aika katkaisu jonka jälkeen ohjelma lopettaa miettimisen ja valitsee sillä hetkellä parhaaksi todetun siirron
+- Lähteitä aion käyttää projektin aikana kun niitä tarvitsen ja kun löydän sopivan. Aion myös käyttää tekoälyä
+  aiheen ymmärtämiseen, mutta en koodin tuottamiseen.
+
+Aiheen ydin:
+- Aion keskittyä vahvasti vain ohjelman kehittämiseen joka osaa syöttää ulos seuraavan siirron
+- Ojleman ulkoasuun ja itse shakkipeliin en aio keskittyä niin paljon, esimerkiksi terminaaliin tulostettava
+  shakkilauta pelin tilanteesta on tarpeeksi. Asian ydin on itse shakkitietokoneen tekeminen.
+
+- Olen kandivaiheen vuoden kaksi tietojenkäsittelytieteen opiskelija
+- Itse ohjelmoinnin ja kommentit teen englanniksi
