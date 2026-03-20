@@ -1,0 +1,4 @@
+Sain aikaan muutamat nappuloiden siirto työkaluista
+Hain lisää tietoa kuinka ohjlemasta saadaan mahdollisimman nopea
+Tulin kuitenkin lopputulokseen että ensin panostan ohjelman toimivuuteen enkä nopeuteen
+Jos aikaa jää katsotaan saako ohjelmasta entistä nopeamman

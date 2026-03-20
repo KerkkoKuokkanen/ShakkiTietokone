@@ -1,0 +1,5 @@
+
+Ensimmäisellä viikolla sain aikaan määrittelydokumentin.
+Sen lisäksi sain tärkeää tietoa kuinka ohjelman pitäisi toimia
+Korkean tason idea ohjelman kulusta tuli selville
+Haasteita on vielä bittilautojen kanssa työskentely
