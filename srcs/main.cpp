@@ -12,15 +12,17 @@ struct HashEntry {
 };
 
 
-
 int main()
 {
 	GenerateKnighMoves();
 	GenerateKingMoves();
 	GenerateSlides();
 	GeneratePawnAttacks();
-	uint64_t b = 18446462598732906495llu;
-	uint64_t t = GetKnightMoves(b, 0);
-	PrinBoard(t);
+	uint64_t b = 68736253951llu;
+	uint64_t b1 = 72746074111llu;
+	PrinBoard(b);
+	PrinBoard(b1);
+	uint64_t bm = GetRookMoves(b, b1, 36);
+	PrinBoard(bm);
 	return (0);
 }

@@ -1,0 +1,5 @@
+Sain tehtyä siirto työkalut pääosin loppun
+Vaikeuksia oli ymmärtää bitti lautojen kanssa työskentely
+Vielä tehtävänä erikois liikkeet kuten en passant, linnoitus ja ylennys.
+Näiden bittilautojen kannsa siirtojen löytäminen on ollut vaikeaa.
+Kohta pääsen tekemään itse algoritmia eli hakupuuta hyvälle liikkeelle
