@@ -1,0 +1,3 @@
+Simppeli evaluaatio funktio tehty.
+Aika paljon hommaa jää ensiviikolle, mutta luulen saavani ai:n tehtyä valmiiksi sen aikana
+Seuraavaksi pitää tehdä osa ohjelmasta joka osaa siirtää nappuloita, kutsua evaluaatiota ja sitten mennä syvemmälle asteelle.
