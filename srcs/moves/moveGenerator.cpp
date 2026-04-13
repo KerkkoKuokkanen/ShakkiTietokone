@@ -20,6 +20,8 @@ void PrinBoard(uint64_t board)
 	printf("\n");
 }
 
+//All these functions are just hardcoded not so nice looking functions that run once at the program start
+//They are not optimized and they do not need to be because they calculate the move maps just during the init phase.
 static uint64_t GenerateKnighMoveFromPosition(int i)
 {
 	uint64_t ret = 0;

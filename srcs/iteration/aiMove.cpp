@@ -7,6 +7,7 @@
 
 #define NO_CAPTURE 20
 
+//Simple is checkmate function (lazy)
 static bool IsCheckMate(uint64_t kb1, uint64_t kb2)
 {
 	if (kb1 == 0 || kb2 == 0)
@@ -14,6 +15,7 @@ static bool IsCheckMate(uint64_t kb1, uint64_t kb2)
 	return (false);
 }
 
+//Unmakes the already made move so that the board stays clean and usable
 static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
 {
 	uint8_t start = move & 0xFF;
@@ -42,6 +44,7 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
 	boards[eAll] |= toBit;
 }
 
+//Unpacks the move from the 32 bit integer and makes it
 static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 {
 	uint8_t start = move & 0xFF;
@@ -95,22 +98,27 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 	printf("\n");
 } */
 
+
+//The recursive function itself
 static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta, bool white)
 {
 	if (depth == 0 || IsCheckMate(boards[5], boards[11]))
 		return (GetPositionScore(boards));
+	//Stores all the possible moves
 	uint32_t moves[256];
 	if (white)
 	{
 		float maxEval = -9999999.0f;
+		//Generates all the possible moves
 		GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13]);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
-			uint8_t capture = MakeMove(moves[i], boards);
-			float score = AiTurn(boards, depth - 1, alpha, beta, false);
-			UnMakeMove(moves[i], boards, capture);
+			uint8_t capture = MakeMove(moves[i], boards);			//We make a move
+			float score = AiTurn(boards, depth - 1, alpha, beta, false);		//Call the recursion for it
+			UnMakeMove(moves[i], boards, capture);					//And unmake it
 
+			//Checking the score and pruning if we need to
 			maxEval = fmax(maxEval, score);
 			alpha = fmax(alpha, score);
 			if (beta <= alpha)
@@ -140,6 +148,8 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 	}
 }
 
+
+//Function that calls for the recursion and gets the score
 uint16_t GetMove(uint64_t boards[14], bool white)
 {
 	AiTurn(boards, 8, -9999999.0f, 9999999.0f, white);

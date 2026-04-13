@@ -4,6 +4,7 @@
 #include "pieceMoves.h"
 #include "aiMove.h"
 
+//Standard position layout with the corresponding magic numbers
 static void GenerateTheStart(uint64_t *boards)
 {
 	boards[0] = 0x00FF000000000000;		//White pawns
@@ -22,6 +23,7 @@ static void GenerateTheStart(uint64_t *boards)
 	boards[13] = 0x000000000000FFFF;	//Black all pieces
 }
 
+//Initializing move maps
 static void Init()
 {
 	GenerateKnighMoves();
@@ -30,6 +32,7 @@ static void Init()
 	GeneratePawnAttacks();
 }
 
+//Function for the actual game loop that keeps on running
 static void GameLoop()
 {
 	uint64_t boards[14];

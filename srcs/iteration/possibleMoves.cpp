@@ -4,6 +4,7 @@
 #include <bit>
 #include "pieceMoves.h"
 
+//Packs the move into one 32 bit variable
 static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t fullBoardIndex)
 {
 	return (uint32_t)start | ((uint32_t)end << 8) | ((uint32_t)pieceType << 16) | ((uint32_t)fullBoardIndex << 24);
@@ -11,6 +12,7 @@ static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t 
 
 //This function is for generating all the possible moves into an array to be looped in the pruning.
 //It is messy but branching and extra function calls will make it slower.
+//Having these two functions separate gives me the possibility to not use extra if statements that slow the recursion down
 void GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 						uint64_t bishops, uint64_t rooks, uint64_t queens,
 						uint64_t kings, uint64_t fBoard, uint64_t eBoard)
@@ -97,6 +99,7 @@ void GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 	moves[index] = 0;
 }
 
+//Same function but for black pieces
 void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 						uint64_t bishops, uint64_t rooks, uint64_t queens,
 						uint64_t kings, uint64_t fBoard, uint64_t eBoard)
