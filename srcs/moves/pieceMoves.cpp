@@ -21,11 +21,6 @@ uint64_t GetKnightMoves(uint64_t fBoard, int pos)
 	return (knightMoves[pos] & ~fBoard);
 }
 
-uint64_t GetKingMoves(uint64_t fBoard, int pos)
-{
-	return (kingMoves[pos] & ~fBoard);
-}
-
 /* static void PrinBoard(uint64_t board)
 {
 	for (int i = 0; i < 64; i++)
@@ -36,25 +31,40 @@ uint64_t GetKingMoves(uint64_t fBoard, int pos)
 		printf("%d ", bit);
 	}
 	printf("\n");
-} */
+}
+ */
+uint64_t GetKingMoves(uint64_t fBoard, int pos)
+{
+	return (kingMoves[pos] & ~fBoard);
+}
 
 //indexes 1, 3, 5, 7 for bishops
 uint64_t GetBishopMoves(uint64_t fBoard, uint64_t eBoard, int pos)
 {
 	uint64_t allPieces = fBoard | eBoard;
 	uint64_t moves = 0;
-	int directions[] = {1, 3, 5, 7};
+	int posDirs[] = {1, 3};
+	int negDirs[] = {5, 7};
 
-	for (int dir : directions)
+	for (int dir : posDirs)
 	{
 		uint64_t ray = slides[dir][pos];
 		uint64_t blockers = ray & allPieces;
-		if (blockers) {
-			int blockerIdx;
-			if (dir == 1 || dir == 7)
-				blockerIdx = std::countr_zero(blockers);
-			else
-				blockerIdx = 63 - std::countl_zero(blockers);
+		if (blockers)
+		{
+			int blockerIdx = std::countr_zero(blockers); 
+			ray &= ~slides[dir][blockerIdx];
+		}
+		moves |= ray;
+	}
+
+	for (int dir : negDirs)
+	{
+		uint64_t ray = slides[dir][pos];
+		uint64_t blockers = ray & allPieces;
+		if (blockers)
+		{
+			int blockerIdx = 63 - std::countl_zero(blockers);
 			ray &= ~slides[dir][blockerIdx];
 		}
 		moves |= ray;
@@ -66,10 +76,9 @@ uint64_t GetRookMoves(uint64_t fBoard, uint64_t eBoard, int pos)
 {
 	uint64_t allPieces = fBoard | eBoard;
 	uint64_t moves = 0;
-	int posDirs[] = {0, 2};
-	int negDirs[] = {4, 6};
+	int posDirs[] = {2, 4};
+	int negDirs[] = {0, 6};
 
-	//Handle Up and Down
 	for (int dir : posDirs)
 	{
 		uint64_t ray = slides[dir][pos];
@@ -81,7 +90,7 @@ uint64_t GetRookMoves(uint64_t fBoard, uint64_t eBoard, int pos)
 		}
 		moves |= ray;
 	}
-	//Handle Left and Right
+
 	for (int dir : negDirs)
 	{
 		uint64_t ray = slides[dir][pos];
@@ -101,40 +110,46 @@ static uint64_t GetPawnAttacks(uint64_t eBoard, int pos, int color)
 	return (pawnAttacks[color][pos] & eBoard);
 }
 
-static uint64_t GetPawnPushes(uint64_t allPieces, int pos, int color)
+static uint64_t GetPawnPushesBlack(uint64_t allPieces, int pos)
 {
 	uint64_t moves = 0;
 	uint64_t bit = (1ULL << pos);
+	uint64_t singlePush = bit >> 8;
 
-	//white
-	if (color == 0)
+	if (!(singlePush & allPieces))
 	{
-		uint64_t singlePush = bit << 8;
-		if (!(singlePush & allPieces))
-		{
-			moves |= singlePush;
-			if ((pos >= 8 && pos <= 15) && !((bit << 16) & allPieces))
-				moves |= (bit << 16);
-		}
-	}
-	//Black
-	else
-	{
-		uint64_t singlePush = bit >> 8;
-		if (!(singlePush & allPieces))
-		{
-			moves |= singlePush;
-			if ((pos >= 48 && pos <= 55) && !((bit >> 16) & allPieces))
-				moves |= (bit >> 16);
-		}
+		moves |= singlePush;
+		if ((pos >= 48 && pos <= 55) && !((bit >> 16) & allPieces))
+			moves |= (bit >> 16);
 	}
 	return (moves);
 }
 
-uint64_t GetAllPawnMoves(uint64_t fBoard, uint64_t eBoard, int pos, int color)
+static uint64_t GetPawnPushesWhite(uint64_t allPieces, int pos)
+{
+	uint64_t moves = 0;
+	uint64_t bit = (1ULL << pos);
+	uint64_t singlePush = bit << 8;
+
+	if (!(singlePush & allPieces))
+	{
+		moves |= singlePush;
+		if ((pos >= 8 && pos <= 15) && !((bit << 16) & allPieces))
+			moves |= (bit << 16);
+	}
+	return (moves);
+}
+
+uint64_t GetAllPawnMovesBlack(uint64_t fBoard, uint64_t eBoard, int pos)
 {
 	uint64_t allPieces = fBoard | eBoard;
-	return (GetPawnAttacks(eBoard, pos, color) | GetPawnPushes(allPieces, pos, color));
+	return (GetPawnAttacks(eBoard, pos, 1) | GetPawnPushesWhite(allPieces, pos));
+}
+
+uint64_t GetAllPawnMovesWhite(uint64_t fBoard, uint64_t eBoard, int pos)
+{
+	uint64_t allPieces = fBoard | eBoard;
+	return (GetPawnAttacks(eBoard, pos, 0) | GetPawnPushesBlack(allPieces, pos));
 }
 
 void SetMoves(uint64_t knm[64], uint64_t km[64], uint64_t sl[8][64], uint64_t pa[2][64])

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "moveGenerator.h"
 #include "pieceMoves.h"
+#include "aiMove.h"
 
 static void GenerateTheStart(uint64_t *boards)
 {
@@ -33,22 +34,12 @@ static void GameLoop()
 {
 	uint64_t boards[14];
 	GenerateTheStart(boards);
-}
-
-static void Testing()
-{
-	uint64_t b = 68736253951llu;
-	uint64_t b1 = 72746074111llu;
-	PrinBoard(b);
-	PrinBoard(b1);
-	uint64_t bm = GetRookMoves(b, b1, 36);
-	PrinBoard(bm);
+	GetMove(boards, true);
 }
 
 int main()
 {
 	Init();
-	Testing();
 	GameLoop();
 	return (0);
 }

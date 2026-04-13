@@ -1,3 +1,9 @@
 Simppeli evaluaatio funktio tehty.
 Aika paljon hommaa jää ensiviikolle, mutta luulen saavani ai:n tehtyä valmiiksi sen aikana
 Seuraavaksi pitää tehdä osa ohjelmasta joka osaa siirtää nappuloita, kutsua evaluaatiota ja sitten mennä syvemmälle asteelle.
+
+Ohjelma on edistynyt ja itse rekursiivisen iteraation tekeminen on alkanut. Ohjelmassa on tällä hetkellä selkeästi virheitä,
+jotka tulee karsia pois lähitulevaisuudessa. Myös erikoisliikkeiden implementoiti on tekemättä.
+
+Tällä hetkellä tavoitteena on saada malli toimimaan joka osaa pelata "tyhmää" shakkia ja kun olen todennut sen toimivan,
+lisään erikoissiirrot mukaan.

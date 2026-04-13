@@ -9,6 +9,7 @@ uint64_t GetKnightMoves(uint64_t fBoard, int pos);
 uint64_t GetKingMoves(uint64_t fBoard, int pos);
 uint64_t GetBishopMoves(uint64_t fBoard, uint64_t eBoard, int pos);
 uint64_t GetRookMoves(uint64_t fBoard, uint64_t eBoard, int pos);
-uint64_t GetAllPawnMoves(uint64_t fBoard, uint64_t eBoard, int pos, int color);
+uint64_t GetAllPawnMovesWhite(uint64_t fBoard, uint64_t eBoard, int pos);
+uint64_t GetAllPawnMovesBlack(uint64_t fBoard, uint64_t eBoard, int pos);
 
 #endif
