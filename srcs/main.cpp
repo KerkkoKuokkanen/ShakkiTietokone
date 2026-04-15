@@ -3,6 +3,9 @@
 #include "moveGenerator.h"
 #include "pieceMoves.h"
 #include "aiMove.h"
+#include <stdio.h>
+#include <unistd.h>
+#include "gameBoard.h"
 
 //Standard position layout with the corresponding magic numbers
 static void GenerateTheStart(uint64_t *boards)
@@ -32,12 +35,61 @@ static void Init()
 	GeneratePawnAttacks();
 }
 
+static uint8_t MakeMove(uint32_t move, uint64_t *boards)
+{
+	uint8_t start = move & 0xFF;
+	uint8_t end	= (move >> 8) & 0xFF;
+	uint8_t pIdx = (move >> 16) & 0xFF;
+	uint8_t fAll = (move >> 24) & 0xFF;
+
+	//Getting enemy all index
+	uint8_t eAll = fAll ^ 1; 
+	uint64_t enemyAll = boards[eAll];
+		
+	//enemy starting index
+	uint8_t eStart = (eAll - 12) * 6; 
+
+	uint64_t toMask = (1ULL << end);
+	uint64_t fromMaskNot = ~(1ULL << start);
+
+	//Handle own board
+	boards[pIdx] &= fromMaskNot;
+	boards[pIdx] |= toMask;
+		
+	boards[fAll] &= fromMaskNot;
+	boards[fAll] |= toMask;
+
+	//Handle enemy boards
+	boards[eAll] &= ~toMask;
+	if (enemyAll == boards[eAll])
+		return (20);
+
+	//Saving the captured piece for unmakemove later
+	for (uint8_t i = eStart; i < eStart + 6; i++)
+	{
+		if (boards[i] & (1ULL << end))
+		{
+			boards[i] &= ~toMask;
+			return (i);
+		}
+	}
+	return (20);
+}
+
 //Function for the actual game loop that keeps on running
 static void GameLoop()
 {
+	bool white = true;
 	uint64_t boards[14];
 	GenerateTheStart(boards);
-	GetMove(boards, true);
+	while (true)
+	{
+		uint32_t move = GetMove(boards, white);
+		MakeMove(move, boards);
+		PrintGameBoard(boards);
+		white = !white;
+		sleep(1);
+	}
 }
 
 int main()

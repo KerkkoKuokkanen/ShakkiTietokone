@@ -1,4 +1,5 @@
 
 Linux ja mac ympäristössä pitäisi toimia terminaalista kutsu make jonka jälkeen ohjelman voi käynnistää.
 
-Mitään tulostetta tai muuta ei ole vielä implementoitu, että koodin tarkastelu on paras mitä voi arvioida.
+Tällä hetkellä ohjelma tulostaa vain normaalin pelin liikkeitä, AI itseään vastaan. Ohjelmassa on selkeästi vielä virheitä,
+mutta suunta on oikea.

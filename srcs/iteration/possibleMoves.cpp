@@ -112,7 +112,7 @@ void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
-			moves[index] = PackMove(pInd, mInd, 0, 13);
+			moves[index] = PackMove(pInd, mInd, 6, 13);
 			move &= ~(1ULL << mInd);
 			index += 1;
 		}
@@ -125,7 +125,7 @@ void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
-			moves[index] = PackMove(pInd, mInd, 1, 13);
+			moves[index] = PackMove(pInd, mInd, 7, 13);
 			move &= ~(1ULL << mInd);
 			index += 1;
 		}
@@ -138,7 +138,7 @@ void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
-			moves[index] = PackMove(pInd, mInd, 2, 13);
+			moves[index] = PackMove(pInd, mInd, 8, 13);
 			move &= ~(1ULL << mInd);
 			index += 1;
 		}
@@ -151,7 +151,7 @@ void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
-			moves[index] = PackMove(pInd, mInd, 3, 13);
+			moves[index] = PackMove(pInd, mInd, 9, 13);
 			move &= ~(1ULL << mInd);
 			index += 1;
 		}
@@ -164,7 +164,7 @@ void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
-			moves[index] = PackMove(pInd, mInd, 4, 13);
+			moves[index] = PackMove(pInd, mInd, 10, 13);
 			move &= ~(1ULL << mInd);
 			index += 1;
 		}
@@ -177,7 +177,7 @@ void GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
-			moves[index] = PackMove(pInd, mInd, 5, 13);
+			moves[index] = PackMove(pInd, mInd, 11, 13);
 			move &= ~(1ULL << mInd);
 			index += 1;
 		}

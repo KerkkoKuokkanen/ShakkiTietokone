@@ -5,7 +5,7 @@ static uint16_t GetPositionScoreS(uint64_t pawns, uint64_t knights, uint64_t bis
 {
 	uint16_t score = 0;
 	if (king != 0)
-		score += 10000;
+		score += 5000;
 	score += std::popcount(pawns);
 	score += std::popcount(knights | bishops) * 3;
 	score += std::popcount(queens) * 9;
