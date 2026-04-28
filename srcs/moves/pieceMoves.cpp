@@ -43,8 +43,8 @@ uint64_t GetBishopMoves(uint64_t fBoard, uint64_t eBoard, int pos)
 {
 	uint64_t allPieces = fBoard | eBoard;
 	uint64_t moves = 0;
-	int posDirs[] = {1, 3};
-	int negDirs[] = {5, 7};
+	int negDirs[] = {5, 3};
+	int posDirs[] = {1, 7};
 
 	for (int dir : posDirs)
 	{
@@ -52,7 +52,7 @@ uint64_t GetBishopMoves(uint64_t fBoard, uint64_t eBoard, int pos)
 		uint64_t blockers = ray & allPieces;
 		if (blockers)
 		{
-			int blockerIdx = std::countr_zero(blockers); 
+			int blockerIdx = 63 - std::countl_zero(blockers); 
 			ray &= ~slides[dir][blockerIdx];
 		}
 		moves |= ray;
@@ -64,11 +64,12 @@ uint64_t GetBishopMoves(uint64_t fBoard, uint64_t eBoard, int pos)
 		uint64_t blockers = ray & allPieces;
 		if (blockers)
 		{
-			int blockerIdx = 63 - std::countl_zero(blockers);
+			int blockerIdx = std::countr_zero(blockers);
 			ray &= ~slides[dir][blockerIdx];
 		}
 		moves |= ray;
 	}
+
 	return (moves & ~fBoard);
 }
 
