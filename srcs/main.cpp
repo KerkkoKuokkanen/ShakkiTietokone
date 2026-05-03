@@ -9,6 +9,7 @@
 #include "test.h"
 #include <string>
 #include <iostream>
+#include "castle.h"
 
 //Standard position layout with the corresponding magic numbers
 static void GenerateTheStart(uint64_t *boards)
@@ -38,20 +39,22 @@ static void Init()
 	GeneratePawnAttacks();
 }
 
-static uint8_t MakeMove(uint32_t move, uint64_t *boards)
+static void MakeMove(uint32_t move, uint64_t *boards)
 {
 	uint8_t start = move & 0xFF;
+	if (start >= 100)
+	{
+		uint8_t c = 0;
+		CastleTheKing(boards, start, &c);
+		return ;
+	}
 	uint8_t end	= (move >> 8) & 0xFF;
 	uint8_t pIdx = (move >> 16) & 0xF;
 	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
 
 	//Getting enemy all index
-	uint8_t eAll = fAll ^ 1; 
-	uint64_t enemyAll = boards[eAll];
-		
-	//enemy starting index
-	uint8_t eStart = (eAll - 12) * 6; 
+	uint8_t eAll = fAll ^ 1;
 
 	uint64_t toMask = (1ULL << end);
 	uint64_t fromMaskNot = ~(1ULL << start);
@@ -65,26 +68,10 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 
 	//Handle enemy boards
 	boards[eAll] &= ~toMask;
-	if (enemyAll == boards[eAll])
-		return (20);
-
-	//Saving the captured piece for unmakemove later
-	for (uint8_t i = eStart; i < eStart + 6; i++)
-	{
-		if (boards[i] & (1ULL << end))
-		{
-			boards[i] &= ~toMask;
-			return (i);
-		}
-	}
-	return (20);
 }
 
-//Function for the actual game loop that keeps on running
-static void GameLoop(int parameter)
+static void MakeBoards(int parameter, uint64_t *boards)
 {
-	bool white = true;
-	uint64_t boards[14];
 	if (parameter == 1)
 		GenerateMateInTwoBoards(boards);
 	else if (parameter == 2)
@@ -93,8 +80,18 @@ static void GameLoop(int parameter)
 		GenerateMateInThree(boards);
 	else if (parameter == 4)
 		TestPromotion(boards);
+	else if (parameter == 5)
+		CastleTest(boards);
 	else
 		GenerateTheStart(boards);
+}
+
+//Function for the actual game loop that keeps on running
+static void GameLoop(int parameter)
+{
+	bool white = true;
+	uint64_t boards[14];
+	MakeBoards(parameter, boards);
 	PrintGameBoard(boards);
 	sleep(1);
 	while (true)
@@ -107,10 +104,6 @@ static void GameLoop(int parameter)
 		}
 		MakeMove(move, boards);
 		PrintGameBoard(boards);
-		/* for (int i = 0; i < 14; i++)
-		{
-			printf("%llu\n", boards[i]);
-		} */
 		white = !white;
 		printf("Press enter to continue\n");
 		std::cin.ignore();
@@ -134,6 +127,8 @@ int main(int argc, char **argv)
 			GameLoop(3);
 		else if (argument == "test4")
 			GameLoop(4);
+		else if (argument == "castle")
+			GameLoop(5);
 		else
 			GameLoop(0);
 	}

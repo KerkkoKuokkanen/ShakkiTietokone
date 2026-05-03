@@ -2,9 +2,7 @@
 #include "checksAndPins.h"
 #include <bit>
 #include "pieceMoves.h"
-#include <stdio.h>
-
-//static uint64_t castleMaskLeft = (1ull << 56) | (1ull << 60);
+#include "castle.h"
 
 //Packs the move into one 32 bit variable
 static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t fullBoardIndex, uint8_t endType)
@@ -21,27 +19,6 @@ static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t 
 			((uint32_t)endType << 20) | 
 			((uint32_t)fullBoardIndex << 24);
 }
-
-/* static void PrinBoard(uint64_t board)
-{
-	for (int i = 0; i < 64; i++)
-	{
-		int bit = (board >> i) & 1ULL;
-		if (i % 8 == 0)
-			printf("\n");
-		printf("%d ", bit);
-	}
-	printf("\n");
-} */
-
-//static void CastlingWhiteLeft(uint64_t *boards)
-//{
-	//static uint64_t maskRight = (1ull << 63) | (1ull << 60);
-	//static uint64_t maskLeft = (1ull << 56) | (1ull << 60);
-	//static const uint64_t occupancyMaskRight = (1ull << 61) | (1ull << 62);
-	//static const uint64_t occupancyMaskLeft = (1ull << 57) | (1ull << 58) | (1ull << 59);
-
-//}
 
 static void PackPawnMoveBlack(uint32_t *moves, uint8_t *index, uint8_t start, uint8_t end)
 {
@@ -183,7 +160,7 @@ uint8_t GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		}
 		queens &= ~(1ULL << pInd);
 	}
-	//CastlingWhiteLeft(allBoards);
+	CastlingWhite(allBoards, moves, &index);
 	uint64_t move = GetKingMoves(fBoard, kingPos);
 	while (move != 0)
 	{
@@ -302,6 +279,7 @@ uint8_t GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		}
 		queens &= ~(1ULL << pInd);
 	}
+	CastlingBlack(allBoards, moves, &index);
 	uint64_t move = GetKingMoves(fBoard, kingPos);
 	while (move != 0)
 	{

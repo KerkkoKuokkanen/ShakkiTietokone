@@ -3,7 +3,7 @@
 #include "posEvaluation.h"
 #include "pieceMoves.h"
 #include <math.h>
-#include <stdio.h>
+#include "castle.h"
 
 #define NO_CAPTURE 20
 #define DEPTH 5
@@ -16,9 +16,16 @@ bool GetGameOver()
 }
 
 //Unmakes the already made move so that the board stays clean and usable
-static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
+static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture, uint8_t castleRights)
 {
 	uint8_t start = move & 0xFF;
+	if (start >= 100)
+	{
+		UnCastleTheKing(boards, start);
+		ResetCastleRights(castleRights);
+		return ;
+	}
+
 	uint8_t end = (move >> 8) & 0xFF;
 	uint8_t pIdx = (move >> 16) & 0xF;
 	uint8_t endType = (move >> 20) & 0xF;
@@ -37,6 +44,7 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
 	//Also for all friendly pieces
 	boards[fAll] &= ~toBit;
 	boards[fAll] |= fromBit;
+	ResetCastleRights(castleRights);
 
 	if (capture == NO_CAPTURE)
 		return ;
@@ -47,9 +55,15 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
 }
 
 //Unpacks the move from the 32 bit integer and makes it
-static uint8_t MakeMove(uint32_t move, uint64_t *boards)
+static uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
 {
 	uint8_t start = move & 0xFF;
+	if (start >= 100)
+	{
+		CastleTheKing(boards, start, castleRights);
+		return (NO_CAPTURE);
+	}
+
 	uint8_t end	= (move >> 8) & 0xFF;
 	uint8_t pIdx = (move >> 16) & 0xF;
 	uint8_t endType = (move >> 20) & 0xF;
@@ -74,6 +88,7 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 
 	//Handle enemy boards
 	boards[eAll] &= ~toMask;
+	SetCastleRights(castleRights, start, end);
 	if (enemyAll == boards[eAll])
 		return (NO_CAPTURE);
 
@@ -89,18 +104,6 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 	return (NO_CAPTURE);
 }
 
-/* static void PrinBoard(uint64_t board)
-{
-	for (int i = 0; i < 64; i++)
-	{
-		int bit = (board >> i) & 1ULL;
-		if (i % 8 == 0)
-			printf("\n");
-		printf("%d ", bit);
-	}
-	printf("\n");
-} */
-
 //The recursive function itself
 static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta, bool white)
 {
@@ -108,6 +111,7 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 		return (GetPositionScore(boards));
 	//Stores all the possible moves
 	uint32_t moves[256];
+	uint8_t castleRights = 0;
 	if (white)
 	{
 		float maxEval = -9999999.0f;
@@ -120,9 +124,9 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
-			uint8_t capture = MakeMove(moves[i], boards);			//We make a move
+			uint8_t capture = MakeMove(moves[i], boards, &castleRights);			//We make a move
 			float score = AiTurn(boards, depth - 1, alpha, beta, false);		//Call the recursion for it
-			UnMakeMove(moves[i], boards, capture);					//And unmake it
+			UnMakeMove(moves[i], boards, capture, castleRights);					//And unmake it
 
 			//Checking the score and pruning if we need to
 			maxEval = fmax(maxEval, score);
@@ -144,9 +148,9 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
-			uint8_t capture = MakeMove(moves[i], boards);
+			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
 			float score = AiTurn(boards, depth - 1, alpha, beta, true);
-			UnMakeMove(moves[i], boards, capture);
+			UnMakeMove(moves[i], boards, capture, castleRights);
 
 			minEval = fmin(minEval, score);
 			beta = fmin(beta, score);
@@ -163,6 +167,7 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 {
 	uint32_t move = 0;
 	uint32_t moves[256];
+	uint8_t castleRights = 0;
 	if (white)
 	{
 		float best = -99999999.0f;
@@ -175,9 +180,9 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
-			uint8_t capture = MakeMove(moves[i], boards);
+			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
 			float score = AiTurn(boards, DEPTH, -9999999.0f, 9999999.0f, false);
-			UnMakeMove(moves[i], boards, capture);
+			UnMakeMove(moves[i], boards, capture, castleRights);
 
 			if (score > best)
 			{
@@ -199,9 +204,9 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
-			uint8_t capture = MakeMove(moves[i], boards);
+			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
 			float score = AiTurn(boards, DEPTH, -9999999.0f, 9999999.0f, true);
-			UnMakeMove(moves[i], boards, capture);
+			UnMakeMove(moves[i], boards, capture, castleRights);
 
 			if (score < best)
 			{

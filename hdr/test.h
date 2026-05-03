@@ -8,6 +8,7 @@ void GenerateMateInTwoBoards(uint64_t *boards);
 void GenerateMateInTwoBoards2(uint64_t *boards);
 void GenerateMateInThree(uint64_t *boards);
 void TestPromotion(uint64_t *boards);
+void CastleTest(uint64_t *boards);
 void TestAttacks();
 
 #endif

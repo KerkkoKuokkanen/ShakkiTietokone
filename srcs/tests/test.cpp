@@ -76,6 +76,27 @@ void TestPromotion(uint64_t *boards)
 	boards[13] = boards[11] | boards[10];	//Black all pieces!
 }
 
+
+#include "castle.h"
+void CastleTest(uint64_t *boards)
+{
+	boards[0] = (1ull << 51) | (1ull << 50) | 0x00F0000000000000;
+	boards[1] = 0;
+	boards[2] = (1ull << 7);
+	boards[3] = (1ull << 63);
+	boards[4] = 0;
+	boards[5] = (1ull << 60);
+	boards[6] = (1ull << 49) | (1ull << 48);
+	boards[7] = 0;
+	boards[8] = 0;
+	boards[9] = 0;
+	boards[10] = 0;
+	boards[11] = (1ull << 56);
+	boards[12] = boards[0] | boards[3] | boards[5] | boards[2];
+	boards[13] = boards[6] | boards[11];
+	
+}
+
 void TestAttacks()
 {
 	uint64_t boards[14];
