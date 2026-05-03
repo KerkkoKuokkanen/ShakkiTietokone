@@ -1,0 +1,15 @@
+
+Testaus on tehty selvittämään muuutamassa eri tilanteessa jossa on varma shakkimatti kahden tai
+kolmen siirron päässä.
+
+Testejä voi testata antamalla aluksi argumentin ohjelmalle: test1, test2 tai test3
+
+Tietokone saa pelitilanteen netistä hakemistani eri shakkimatti n siirron päässä tilanteista.
+Olen myös pyrkinyt testeissä painottamaan "hankalia" tilanteita, joissa väärä siirto voi johtaa
+tasapeliin (stalemate) tai että on nappuloita jotka eivät pysty liikkumaan sillä se olisi
+laiton siirto.
+
+Näillä testeillä pyritään tarkastamaan että tietokone varmasti löytää parhaan mahdollisen shakkimatin
+mahdollisimman nopeasti. Esimekiksi että se tekee shakkimatin kahdella siirrolla jos se on mahdollista eikä kolmella.
+Myös että puolustava pelaaja ei tee laittomia siirtoaj, sekä että tietokone ei hyväksy helppoa tasapeliä voittavassa
+tilanteessa.

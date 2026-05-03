@@ -3,3 +3,7 @@ Linux ja mac ympäristössä pitäisi toimia terminaalista kutsu make jonka jäl
 
 Tällä hetkellä ohjelma tulostaa vain normaalin pelin liikkeitä, AI itseään vastaan. Ohjelmassa on selkeästi vielä virheitä,
 mutta suunta on oikea.
+
+Testaus toimii antamalla käynniestäessä argumentti ohjelmalle:
+test1, test2, test3
+Eri shakkimatti tilanteita

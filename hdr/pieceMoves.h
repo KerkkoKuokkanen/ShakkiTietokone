@@ -11,5 +11,11 @@ uint64_t GetBishopMoves(uint64_t fBoard, uint64_t eBoard, int pos);
 uint64_t GetRookMoves(uint64_t fBoard, uint64_t eBoard, int pos);
 uint64_t GetAllPawnMovesWhite(uint64_t fBoard, uint64_t eBoard, int pos);
 uint64_t GetAllPawnMovesBlack(uint64_t fBoard, uint64_t eBoard, int pos);
+uint64_t GetPawnAttacks(uint64_t eBoard, int pos, int color);
+
+uint64_t GetRayBetween(uint8_t pos1, uint8_t pos2);
+uint64_t GetLineMask(uint8_t pos1, uint8_t pos2);
+uint64_t GetRookSingleRayPinBoard(uint64_t eBoard, uint8_t pos, uint8_t dir);
+uint64_t GetBighopSingleRayPinBoard(uint64_t eBoard, uint8_t pos, uint8_t dir);
 
 #endif

@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "gameBoard.h"
+#include "test.h"
+#include <string>
+#include <iostream>
 
 //Standard position layout with the corresponding magic numbers
 static void GenerateTheStart(uint64_t *boards)
@@ -39,7 +42,8 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 {
 	uint8_t start = move & 0xFF;
 	uint8_t end	= (move >> 8) & 0xFF;
-	uint8_t pIdx = (move >> 16) & 0xFF;
+	uint8_t pIdx = (move >> 16) & 0xF;
+	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
 
 	//Getting enemy all index
@@ -54,7 +58,7 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 
 	//Handle own board
 	boards[pIdx] &= fromMaskNot;
-	boards[pIdx] |= toMask;
+	boards[endType] |= toMask;
 		
 	boards[fAll] &= fromMaskNot;
 	boards[fAll] |= toMask;
@@ -77,24 +81,61 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 }
 
 //Function for the actual game loop that keeps on running
-static void GameLoop()
+static void GameLoop(int parameter)
 {
 	bool white = true;
 	uint64_t boards[14];
-	GenerateTheStart(boards);
+	if (parameter == 1)
+		GenerateMateInTwoBoards(boards);
+	else if (parameter == 2)
+		GenerateMateInTwoBoards2(boards);
+	else if (parameter == 3)
+		GenerateMateInThree(boards);
+	else if (parameter == 4)
+		TestPromotion(boards);
+	else
+		GenerateTheStart(boards);
+	PrintGameBoard(boards);
+	sleep(1);
 	while (true)
 	{
 		uint32_t move = GetMove(boards, white);
+		if (GetGameOver())
+		{
+			printf("Game over!\n");
+			break ;
+		}
 		MakeMove(move, boards);
 		PrintGameBoard(boards);
+		/* for (int i = 0; i < 14; i++)
+		{
+			printf("%llu\n", boards[i]);
+		} */
 		white = !white;
-		sleep(1);
+		printf("Press enter to continue\n");
+		std::cin.ignore();
+		printf("Thinking...\n");
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	Init();
-	GameLoop();
+	if (argc == 1)
+		GameLoop(0);
+	else
+	{
+		std::string argument = argv[1];
+		if (argument == "test1")
+			GameLoop(1);
+		else if (argument == "test2")
+			GameLoop(2);
+		else if (argument == "test3")
+			GameLoop(3);
+		else if (argument == "test4")
+			GameLoop(4);
+		else
+			GameLoop(0);
+	}
 	return (0);
 }

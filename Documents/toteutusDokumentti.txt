@@ -1,0 +1,38 @@
+
+Shakkilauta:
+
+Shakkilaudat on toteutettu 64 bittisillä laudoilla joita on 14.
+kuusi lautaa kummallekkin pelaajalle, jotka jokainen vastaa tiettyä nappula tyyppiä
+Kaksi ylimääräistä lautaa molempien pelaajien kaikkien nappuloiden paikoista
+
+
+Algoritmi:
+
+Tärkeimpänä algoritmina toimii minimax algoritmi. Algoritmi kokeilee kaikkia mahdollisia siirtoja ja niiden
+pisteytyksen perusteella karsii eri siirtojen haaroja sen perusteella, jos on todettu että nämä siirrot eivät
+voi tuottaa hyvää tilannetta, olettaen että vastustaja pelaa optimaalisesti. Lisäksi nopeuden vuoksi on 
+hyödynnetty aiemmin mainittuja bittilautoja. Lisäksi olen ohjelman käynnistyessä laskenut eri liikkumis
+mahdollisuuksia nappuloille eri paikoissa pelilautaa. Näitä mahdollisia siirtoja hyödynnän selvittäessä
+mahdollisia siirtoja ja selvittäessä että onko kuningas shakissa tai että onko nappula "pinned" kuninkaaseen.
+Eli onko nappula ainut este hyökkääjän ja kuninkaan välissä.
+
+
+Aika ja tilavaativuudet:
+
+Shakkitietokone käy läpi kaikki liikkeet jokaista syvyyttä kohden joten iterointia tapahtuu mahdollisten siirtojen (n)
+mukaan. Eli syvyydellä (k) tapahtuu k^n iterointeja pahimmassa tapauksessa. Minimax algoritmi kuitenkin suurimmassa osassa
+karsii huomattavan määrän iterointeja pois.
+
+
+Laajojen kielimallien käyttö:
+
+Olen käyttänyt googlen gemini tekoälyä hakemaan taika numeroita bittilautoihin liittyen ja hakemassa
+yleistä ideaa tiettyihin onglema kohtiin. Kaikki koodi on kuitenkin itse tuotettua.
+
+
+Lähteet:
+
+https://www.geeksforgeeks.org/artificial-intelligence/game-playing-in-artificial-intelligence/
+https://www.geeksforgeeks.org/dsa/minimax-algorithm-in-game-theory-set-1-introduction/
+
+Käytin näitä lähteitä ohjelman suunnittelun alussa ymmärtääkseni ongelman.

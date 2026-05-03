@@ -92,11 +92,11 @@ void PrintGameBoard(uint64_t boards[12])
 		if (i % 8 == 0)
 			printf("\n");
 		if (white[i] == '.' && black[i] == '.')
-			printf(".");
+			printf(". ");
 		else if (white[i] != '.')
-			printf("\033[32m%c\033[0m", white[i]);
+			printf("\033[32m%c \033[0m", white[i]);
 		else if (black[i] != '.')
-			printf("\033[31m%c\033[0m", black[i]);
+			printf("\033[31m%c \033[0m", black[i]);
 	}
 	printf("\n");
 }

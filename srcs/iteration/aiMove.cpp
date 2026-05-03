@@ -6,13 +6,13 @@
 #include <stdio.h>
 
 #define NO_CAPTURE 20
+#define DEPTH 5
 
-//Simple is checkmate function (lazy)
-static bool IsCheckMate(uint64_t kb1, uint64_t kb2)
+static bool gameOver = false;
+
+bool GetGameOver()
 {
-	if (kb1 == 0 || kb2 == 0)
-		return (true);
-	return (false);
+	return (gameOver);
 }
 
 //Unmakes the already made move so that the board stays clean and usable
@@ -20,9 +20,10 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
 {
 	uint8_t start = move & 0xFF;
 	uint8_t end = (move >> 8) & 0xFF;
-	uint8_t pIdx = (move >> 16) & 0xFF;
+	uint8_t pIdx = (move >> 16) & 0xF;
+	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
-		
+
 	//Getting enemies position
 	uint8_t eAll = fAll ^ 1;
 
@@ -30,7 +31,7 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture)
 	uint64_t toBit = (1ULL << end);
 
 	//Moving piece back
-	boards[pIdx] &= ~toBit;
+	boards[endType] &= ~toBit;
 	boards[pIdx] |= fromBit;
 
 	//Also for all friendly pieces
@@ -50,7 +51,8 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 {
 	uint8_t start = move & 0xFF;
 	uint8_t end	= (move >> 8) & 0xFF;
-	uint8_t pIdx = (move >> 16) & 0xFF;
+	uint8_t pIdx = (move >> 16) & 0xF;
+	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
 
 	//Getting enemy all index
@@ -65,7 +67,7 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 
 	//Handle own board
 	boards[pIdx] &= fromMaskNot;
-	boards[pIdx] |= toMask;
+	boards[endType] |= toMask;
 		
 	boards[fAll] &= fromMaskNot;
 	boards[fAll] |= toMask;
@@ -99,11 +101,10 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 	printf("\n");
 } */
 
-
 //The recursive function itself
 static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta, bool white)
 {
-	if (depth == 0 || IsCheckMate(boards[5], boards[11]))
+	if (depth == 0 || boards[5] == 0 || boards[11] == 0)
 		return (GetPositionScore(boards));
 	//Stores all the possible moves
 	uint32_t moves[256];
@@ -111,7 +112,11 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 	{
 		float maxEval = -9999999.0f;
 		//Generates all the possible moves
-		GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13]);
+		uint8_t r = GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13], boards);
+		if (r == 1)
+			return (0.0f);
+		if (r == 2)
+			return (maxEval - depth * 10);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
@@ -131,7 +136,11 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 	else
 	{
 		float minEval = 9999999.0f;
-		GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12]);
+		uint8_t r = GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12], boards);
+		if (r == 1)
+			return (0.0f);
+		if (r == 2)
+			return (minEval + depth * 10);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
@@ -149,7 +158,6 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 	}
 }
 
-
 //Function that calls for the recursion and gets the score
 uint32_t GetMove(uint64_t boards[14], bool white)
 {
@@ -158,12 +166,17 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 	if (white)
 	{
 		float best = -99999999.0f;
-		GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13]);
+		uint8_t r = GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13], boards);
+		if (r != 0)
+		{
+			gameOver = true;
+			return (0);
+		}
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
 			uint8_t capture = MakeMove(moves[i], boards);
-			float score = AiTurn(boards, 5, -9999999.0f, 9999999.0f, false);
+			float score = AiTurn(boards, DEPTH, -9999999.0f, 9999999.0f, false);
 			UnMakeMove(moves[i], boards, capture);
 
 			if (score > best)
@@ -177,12 +190,17 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 	else
 	{
 		float best = 99999999.0f;
-		GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12]);
+		uint8_t r = GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12], boards);
+		if (r != 0)
+		{
+			gameOver = true;
+			return (0);
+		}
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
 			uint8_t capture = MakeMove(moves[i], boards);
-			float score = AiTurn(boards, 5, -9999999.0f, 9999999.0f, false);
+			float score = AiTurn(boards, DEPTH, -9999999.0f, 9999999.0f, true);
 			UnMakeMove(moves[i], boards, capture);
 
 			if (score < best)
