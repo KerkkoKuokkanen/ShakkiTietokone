@@ -4,6 +4,6 @@
 
 #include <bit>
 
-float GetPositionScore(uint64_t *boards);
+int GetPositionScore(uint64_t *boards);
 
 #endif

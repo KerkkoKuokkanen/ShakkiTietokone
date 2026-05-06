@@ -2,7 +2,7 @@
 Testaus on tehty selvittämään muuutamassa eri tilanteessa jossa on varma shakkimatti kahden tai
 kolmen siirron päässä.
 
-Testejä voi testata antamalla aluksi argumentin ohjelmalle: test1, test2 tai test3
+Testejä voi testata antamalla aluksi argumentin ohjelmalle: test1, test2, test3, test4, castle1, castle2, pass, passb
 
 Tietokone saa pelitilanteen netistä hakemistani eri shakkimatti n siirron päässä tilanteista.
 Olen myös pyrkinyt testeissä painottamaan "hankalia" tilanteita, joissa väärä siirto voi johtaa

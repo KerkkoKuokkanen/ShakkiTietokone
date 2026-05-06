@@ -1,9 +1,9 @@
 
 Linux ja mac ympäristössä pitäisi toimia terminaalista kutsu make jonka jälkeen ohjelman voi käynnistää.
 
-Tällä hetkellä ohjelma tulostaa vain normaalin pelin liikkeitä, AI itseään vastaan. Ohjelmassa on selkeästi vielä virheitä,
-mutta suunta on oikea.
+Tietokone pelaa itse itseään vastaan ja painamalla enter saat seuraavan vuoron.
+Ohjelma ilmoittaa kun se on tehnyt liikkeen ja voit painaa enter.
 
 Testaus toimii antamalla käynniestäessä argumentti ohjelmalle:
-test1, test2, test3
+test1, test2, test3, test4, castle1, castle2, pass, passb
 Eri shakkimatti tilanteita

@@ -4,6 +4,10 @@
 #include "pieceMoves.h"
 #include <math.h>
 #include "castle.h"
+#include "gameBoard.h"
+#include <stdio.h>
+#include "enPassant.h"
+#include <algorithm>
 
 #define NO_CAPTURE 20
 #define DEPTH 5
@@ -30,6 +34,20 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture, uint8_t
 	uint8_t pIdx = (move >> 16) & 0xF;
 	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
+
+	if (endType == 14)
+	{
+		uint8_t victimSquare = (fAll == 12) ? end + 8 : end - 8;
+
+		boards[pIdx] &= ~(1ull << end);
+		boards[pIdx] |= (1ull << start);
+		boards[fAll] &= ~(1ull << end);
+		boards[fAll] |= (1ull << start);
+
+		boards[capture] |= (1ull << victimSquare);
+		boards[fAll ^ 1] |= (1ull << victimSquare);
+		return ;
+	}
 
 	//Getting enemies position
 	uint8_t eAll = fAll ^ 1;
@@ -61,6 +79,7 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
 	if (start >= 100)
 	{
 		CastleTheKing(boards, start, castleRights);
+		SetEnPassantSquare(100);
 		return (NO_CAPTURE);
 	}
 
@@ -68,6 +87,48 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
 	uint8_t pIdx = (move >> 16) & 0xF;
 	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
+
+	if (endType == 14)
+	{
+		uint8_t victimSquare;
+		uint8_t victimBoardIdx;
+
+		if (fAll == 12)
+		{
+			victimSquare = end + 8;
+			victimBoardIdx = 6;
+		}
+		else
+		{
+			victimSquare = end - 8;
+			victimBoardIdx = 0;
+		}
+
+		boards[victimBoardIdx] &= ~(1ull << victimSquare);
+		boards[fAll ^ 1] &= ~(1ull << victimSquare);
+
+		boards[pIdx] &= ~(1ull << start);
+		boards[pIdx] |= (1ull << end);
+		boards[fAll] &= ~(1ull << start);
+		boards[fAll] |= (1ull << end);
+
+		SetEnPassantSquare(100);
+		return victimBoardIdx;
+	}
+
+	if (pIdx == 0)
+	{
+		if (abs((int)start - (int)end) == 16)
+			SetEnPassantSquare(start + 8);
+	}
+	else if (pIdx == 6)
+	{
+		if (abs((int)start - (int)end) == 16)
+			SetEnPassantSquare(start - 8);
+	}
+	else
+		SetEnPassantSquare(100);
+
 
 	//Getting enemy all index
 	uint8_t eAll = fAll ^ 1; 
@@ -105,7 +166,7 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
 }
 
 //The recursive function itself
-static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta, bool white)
+static int AiTurn(uint64_t boards[14], uint8_t depth, int alpha, int beta, bool white)
 {
 	if (depth == 0 || boards[5] == 0 || boards[11] == 0)
 		return (GetPositionScore(boards));
@@ -114,23 +175,25 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 	uint8_t castleRights = 0;
 	if (white)
 	{
-		float maxEval = -9999999.0f;
+		int maxEval = -9999999;
 		//Generates all the possible moves
 		uint8_t r = GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13], boards);
 		if (r == 1)
-			return (0.0f);
+			return (0);
 		if (r == 2)
 			return (maxEval - depth * 10);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
+			int8_t epSquareTemp = GetEnPassantSquare();
 			uint8_t capture = MakeMove(moves[i], boards, &castleRights);			//We make a move
-			float score = AiTurn(boards, depth - 1, alpha, beta, false);		//Call the recursion for it
+			int score = AiTurn(boards, depth - 1, alpha, beta, false);		//Call the recursion for it
 			UnMakeMove(moves[i], boards, capture, castleRights);					//And unmake it
+			SetEnPassantSquare(epSquareTemp);
 
 			//Checking the score and pruning if we need to
-			maxEval = fmax(maxEval, score);
-			alpha = fmax(alpha, score);
+			maxEval = std::max(maxEval, score);
+			alpha = std::max(alpha, score);
 			if (beta <= alpha)
 				break ;
 			i++;
@@ -139,21 +202,23 @@ static float AiTurn(uint64_t boards[14], uint8_t depth, float alpha, float beta,
 	}
 	else
 	{
-		float minEval = 9999999.0f;
+		int minEval = 9999999;
 		uint8_t r = GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12], boards);
 		if (r == 1)
-			return (0.0f);
+			return (0);
 		if (r == 2)
 			return (minEval + depth * 10);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
+			int8_t epSquareTemp = GetEnPassantSquare();
 			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
-			float score = AiTurn(boards, depth - 1, alpha, beta, true);
+			int score = AiTurn(boards, depth - 1, alpha, beta, true);
 			UnMakeMove(moves[i], boards, capture, castleRights);
+			SetEnPassantSquare(epSquareTemp);
 
-			minEval = fmin(minEval, score);
-			beta = fmin(beta, score);
+			minEval = std::min(minEval, score);
+			beta = std::min(beta, score);
 			if (beta <= alpha)
 				break ;
 			i++;
@@ -170,7 +235,7 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 	uint8_t castleRights = 0;
 	if (white)
 	{
-		float best = -99999999.0f;
+		int best = -99999999;
 		uint8_t r = GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13], boards);
 		if (r != 0)
 		{
@@ -180,9 +245,11 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
+			int8_t epSquareTemp = GetEnPassantSquare();
 			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
-			float score = AiTurn(boards, DEPTH, -9999999.0f, 9999999.0f, false);
+			int score = AiTurn(boards, DEPTH, -9999999, 9999999, false);
 			UnMakeMove(moves[i], boards, capture, castleRights);
+			SetEnPassantSquare(epSquareTemp);
 
 			if (score > best)
 			{
@@ -194,7 +261,7 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 	}
 	else
 	{
-		float best = 99999999.0f;
+		int best = 99999999;
 		uint8_t r = GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12], boards);
 		if (r != 0)
 		{
@@ -204,9 +271,11 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
+			int8_t epSquareTemp = GetEnPassantSquare();
 			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
-			float score = AiTurn(boards, DEPTH, -9999999.0f, 9999999.0f, true);
+			int score = AiTurn(boards, DEPTH, -9999999, 9999999, true);
 			UnMakeMove(moves[i], boards, capture, castleRights);
+			SetEnPassantSquare(epSquareTemp);
 
 			if (score < best)
 			{

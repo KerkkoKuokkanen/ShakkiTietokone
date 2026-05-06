@@ -2,3 +2,5 @@
 Paljon virheitä on korjattu ja tietokone toimii paremmin kuin aikaisemmin.
 Ohjelma osaa nyt löytää varman shakkimatin halutulta syvyydeltä ja testit on implementoitu sen tarkistamiseen
 Erikoisliikkeiden tekeminen on myös aloitettu ja ohjelma lähene valmista työtä kovaa vauhtia.
+
+Ohjelma on pää piirteittäin tällä hetkellä valmis.

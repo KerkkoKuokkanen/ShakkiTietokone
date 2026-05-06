@@ -3,6 +3,7 @@
 #include <bit>
 #include "pieceMoves.h"
 #include "castle.h"
+#include "enPassant.h"
 
 //Packs the move into one 32 bit variable
 static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t fullBoardIndex, uint8_t endType)
@@ -13,10 +14,10 @@ static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t 
 	// bits 20-23: Ending board (4 bits: 0-10, 15 for none)
 	// bits 24-31: Full Board Index
 		
-	return (uint32_t)start | 
-			((uint32_t)end << 8) | 
-			((uint32_t)pieceType << 16) | 
-			((uint32_t)endType << 20) | 
+	return (uint32_t)start |
+			((uint32_t)end << 8) |
+			((uint32_t)pieceType << 16) |
+			((uint32_t)endType << 20) |
 			((uint32_t)fullBoardIndex << 24);
 }
 
@@ -73,9 +74,10 @@ uint8_t GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint8_t pInd = std::countr_zero(pawns);
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetAllPawnMovesWhite(fBoard, eBoard, pInd);
+		GenerateEnPassantWhite(moves, &index, pInd, allBoards, kingPos);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
-			move &= GetLineMask(kingPos, pInd); 
+		if (pieceBit & pinningMask)
+			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
@@ -113,8 +115,8 @@ uint8_t GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint64_t move = GetBishopMoves(fBoard, eBoard, pInd);
 		move &= checkMask;
 		//Checks if the pieceIsPinned
-		if (pieceBit & pinningMask) 
-			move &= GetLineMask(kingPos, pInd); 
+		if (pieceBit & pinningMask)
+			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
@@ -131,8 +133,8 @@ uint8_t GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetRookMoves(fBoard, eBoard, pInd);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
-			move &= GetLineMask(kingPos, pInd); 
+		if (pieceBit & pinningMask)
+			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
@@ -149,7 +151,7 @@ uint8_t GenerateMovesWhite(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetRookMoves(fBoard, eBoard, pInd) | GetBishopMoves(fBoard, eBoard, pInd);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
+		if (pieceBit & pinningMask)
 			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
@@ -197,9 +199,10 @@ uint8_t GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint8_t pInd = std::countr_zero(pawns);
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetAllPawnMovesBlack(fBoard, eBoard, pInd);
+		GenerateEnPassantBlack(moves, &index, pInd, allBoards, kingPos);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
-			move &= GetLineMask(kingPos, pInd); 
+		if (pieceBit & pinningMask)
+			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
@@ -212,7 +215,7 @@ uint8_t GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 	{
 		uint8_t pInd = std::countr_zero(knights);
 		uint64_t pieceBit = (1ULL << pInd);
-		if (pieceBit & pinningMask) 
+		if (pieceBit & pinningMask)
 		{
 			knights &= ~(1ULL << pInd);
 			continue ;
@@ -234,8 +237,8 @@ uint8_t GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetBishopMoves(fBoard, eBoard, pInd);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
-			move &= GetLineMask(kingPos, pInd); 
+		if (pieceBit & pinningMask)
+			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);
@@ -251,7 +254,7 @@ uint8_t GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetRookMoves(fBoard, eBoard, pInd);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
+		if (pieceBit & pinningMask)
 			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
@@ -268,8 +271,8 @@ uint8_t GenerateMovesBlack(uint32_t *moves, uint64_t pawns, uint64_t knights,
 		uint64_t pieceBit = (1ULL << pInd);
 		uint64_t move = GetRookMoves(fBoard, eBoard, pInd) | GetBishopMoves(fBoard, eBoard, pInd);
 		move &= checkMask;
-		if (pieceBit & pinningMask) 
-			move &= GetLineMask(kingPos, pInd); 
+		if (pieceBit & pinningMask)
+			move &= GetLineMask(kingPos, pInd);
 		while (move != 0)
 		{
 			uint8_t mInd = std::countr_zero(move);

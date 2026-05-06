@@ -10,9 +10,11 @@
 #include <string>
 #include <iostream>
 #include "castle.h"
+#include "enPassant.h"
+#include "posEvaluation.h"
 
 //Standard position layout with the corresponding magic numbers
-static void GenerateTheStart(uint64_t *boards)
+static bool GenerateTheStart(uint64_t *boards)
 {
 	boards[0] = 0x00FF000000000000;		//White pawns
 	boards[1] = 0x4200000000000000;		//White knights
@@ -28,6 +30,7 @@ static void GenerateTheStart(uint64_t *boards)
 	boards[11] = 0x0000000000000010;	//Black king
 	boards[12] = 0xFFFF000000000000;	//White all pieces
 	boards[13] = 0x000000000000FFFF;	//Black all pieces
+	return (true);
 }
 
 //Initializing move maps
@@ -38,23 +41,70 @@ static void Init()
 	GenerateSlides();
 	GeneratePawnAttacks();
 }
-
-static void MakeMove(uint32_t move, uint64_t *boards)
+static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 {
 	uint8_t start = move & 0xFF;
+	uint8_t r = 0;
 	if (start >= 100)
 	{
-		uint8_t c = 0;
-		CastleTheKing(boards, start, &c);
-		return ;
+		CastleTheKing(boards, start, &r);
+		SetEnPassantSquare(100);
+		return (20);
 	}
+
 	uint8_t end	= (move >> 8) & 0xFF;
 	uint8_t pIdx = (move >> 16) & 0xF;
 	uint8_t endType = (move >> 20) & 0xF;
 	uint8_t fAll = (move >> 24) & 0xFF;
 
+	if (endType == 14)
+	{
+		uint8_t victimSquare;
+		uint8_t victimBoardIdx;
+
+		if (fAll == 12)
+		{
+			victimSquare = end + 8;
+			victimBoardIdx = 6;
+		}
+		else
+		{
+			victimSquare = end - 8;
+			victimBoardIdx = 0;
+		}
+
+		boards[victimBoardIdx] &= ~(1ull << victimSquare);
+		boards[fAll ^ 1] &= ~(1ull << victimSquare);
+
+		boards[pIdx] &= ~(1ull << start);
+		boards[pIdx] |= (1ull << end);
+		boards[fAll] &= ~(1ull << start);
+		boards[fAll] |= (1ull << end);
+
+		SetEnPassantSquare(100);
+		return victimBoardIdx;
+	}
+
+	if (pIdx == 0)
+	{
+		if (abs((int)start - (int)end) == 16)
+			SetEnPassantSquare(start + 8);
+	}
+	else if (pIdx == 6)
+	{
+		if (abs((int)start - (int)end) == 16)
+			SetEnPassantSquare(start - 8);
+	}
+	else
+		SetEnPassantSquare(100);
+
+
 	//Getting enemy all index
-	uint8_t eAll = fAll ^ 1;
+	uint8_t eAll = fAll ^ 1; 
+	uint64_t enemyAll = boards[eAll];
+		
+	//enemy starting index
+	uint8_t eStart = (eAll - 12) * 6; 
 
 	uint64_t toMask = (1ULL << end);
 	uint64_t fromMaskNot = ~(1ULL << start);
@@ -68,30 +118,49 @@ static void MakeMove(uint32_t move, uint64_t *boards)
 
 	//Handle enemy boards
 	boards[eAll] &= ~toMask;
+	SetCastleRights(&r, start, end);
+	if (enemyAll == boards[eAll])
+		return (20);
+
+	//Saving the captured piece for unmakemove later
+	for (uint8_t i = eStart; i < eStart + 6; i++)
+	{
+		if (boards[i] & (1ULL << end))
+		{
+			boards[i] &= ~toMask;
+			return (i);
+		}
+	}
+	return (20);
 }
 
-static void MakeBoards(int parameter, uint64_t *boards)
+static bool MakeBoards(int parameter, uint64_t *boards)
 {
 	if (parameter == 1)
-		GenerateMateInTwoBoards(boards);
+		return GenerateMateInTwoBoards(boards);
 	else if (parameter == 2)
-		GenerateMateInTwoBoards2(boards);
+		return GenerateMateInTwoBoards2(boards);
 	else if (parameter == 3)
-		GenerateMateInThree(boards);
+		return GenerateMateInThree(boards);
 	else if (parameter == 4)
-		TestPromotion(boards);
+		return TestPromotion(boards);
 	else if (parameter == 5)
-		CastleTest(boards);
+		return CastleTest(boards);
+	else if (parameter == 6)
+		return CastleTestBlack(boards);
+	else if (parameter == 7)
+		return (EnPassantTest(boards));
+	else if (parameter == 8)
+		return (EnPassantTestBlack(boards));
 	else
-		GenerateTheStart(boards);
+		return GenerateTheStart(boards);
 }
 
 //Function for the actual game loop that keeps on running
 static void GameLoop(int parameter)
 {
-	bool white = true;
 	uint64_t boards[14];
-	MakeBoards(parameter, boards);
+	bool white = MakeBoards(parameter, boards);
 	PrintGameBoard(boards);
 	sleep(1);
 	while (true)
@@ -127,8 +196,14 @@ int main(int argc, char **argv)
 			GameLoop(3);
 		else if (argument == "test4")
 			GameLoop(4);
-		else if (argument == "castle")
+		else if (argument == "castle1")
 			GameLoop(5);
+		else if (argument == "castle2")
+			GameLoop(6);
+		else if (argument == "pass")
+			GameLoop(7);
+		else if (argument == "passb")
+			GameLoop(8);
 		else
 			GameLoop(0);
 	}

@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include "gameBoard.h"
 #include "aiMove.h"
+#include "enPassant.h"
 #include <stdio.h>
 
-void GenerateMateInTwoBoards(uint64_t *boards)
+bool GenerateMateInTwoBoards(uint64_t *boards)
 {
 	boards[0] = 0x0000040800004000;		//White pawns!
 	boards[1] = 0;		//White knights
@@ -20,9 +21,10 @@ void GenerateMateInTwoBoards(uint64_t *boards)
 	boards[11] = 0x0000000000000040;	//Black king!
 	boards[12] = 0x00000C0800904000;	//White all pieces!
 	boards[13] = 0x0000000824242040;	//Black all pieces!
+	return (true);
 }
 
-void GenerateMateInTwoBoards2(uint64_t *boards)
+bool GenerateMateInTwoBoards2(uint64_t *boards)
 {
 	boards[0] = 0;		//White pawns!
 	boards[1] = 0;		//White knights
@@ -38,9 +40,10 @@ void GenerateMateInTwoBoards2(uint64_t *boards)
 	boards[11] = 0x8000000000000000;	//Black king!
 	boards[12] = boards[2] | boards[3] | boards[4] | boards[5];	//White all pieces!
 	boards[13] = boards[6] | boards[9] | boards[10] | boards[11];	//Black all pieces!
+	return (true);
 }
 
-void GenerateMateInThree(uint64_t *boards)
+bool GenerateMateInThree(uint64_t *boards)
 {
 	boards[0] = 0;		//White pawns!
 	boards[1] = 1ull << 35;		//White knights
@@ -56,9 +59,10 @@ void GenerateMateInThree(uint64_t *boards)
 	boards[11] = 1ull << 63;	//Black king!
 	boards[12] = boards[1] | boards[3] | boards[5];	//White all pieces!
 	boards[13] = boards[6] | boards[7] | boards[11];	//Black all pieces!
+	return (true);
 }
 
-void TestPromotion(uint64_t *boards)
+bool TestPromotion(uint64_t *boards)
 {
 	boards[0] = 1ull << 10;		//White pawns!
 	boards[1] = 0;		//White knights
@@ -74,11 +78,10 @@ void TestPromotion(uint64_t *boards)
 	boards[11] = 1ull << 63;	//Black king!
 	boards[12] = boards[0] | boards[5];	//White all pieces!
 	boards[13] = boards[11] | boards[10];	//Black all pieces!
+	return (true);
 }
 
-
-#include "castle.h"
-void CastleTest(uint64_t *boards)
+bool CastleTest(uint64_t *boards)
 {
 	boards[0] = (1ull << 51) | (1ull << 50) | 0x00F0000000000000;
 	boards[1] = 0;
@@ -94,36 +97,64 @@ void CastleTest(uint64_t *boards)
 	boards[11] = (1ull << 56);
 	boards[12] = boards[0] | boards[3] | boards[5] | boards[2];
 	boards[13] = boards[6] | boards[11];
-	
+	return (true);
 }
 
-void TestAttacks()
+bool CastleTestBlack(uint64_t *boards)
 {
-	uint64_t boards[14];
-	uint32_t moves[256];
+	boards[0] = (1ull << 8) | (1ull << 9);
+	boards[1] = 0;
+	boards[2] = 0;
+	boards[3] = 0;
+	boards[4] = 0;
+	boards[5] = (1ull);
+	boards[6] = (1ull << 10) | (1ull << 11) | (1ull << 12) | (1ull << 13) | (1ull << 14) | (1ull << 15);
+	boards[7] = 0;
+	boards[8] = (1ull << 63);
+	boards[9] = (1ull << 7);
+	boards[10] = 0;
+	boards[11] = (1ull << 4);
+	boards[12] = boards[0] | boards[5];
+	boards[13] = boards[6] | boards[8] | boards[9] | boards[11];
+	return (false);
+}
 
-	boards[0] = 0;		//White pawns!
-	boards[1] = 0;		//White knights
-	boards[2] = 0;		//White bishops!
-	boards[3] = 262144;		//White Rooks!
-	boards[4] = 4194304 << 8;		//White queen
-	boards[5] = 17592186044416llu;		//White king
-	boards[6] = 0;		//Black pawns!
-	boards[7] = 0;		//Black knights!
-	boards[8] = 0;		//Black bishops
-	boards[9] = 0;		//Black rooks!
-	boards[10] = 0;	//Black queen
-	boards[11] = 268435456;	//Black king!
-	boards[12] = boards[2] | boards[3] | boards[4] | boards[5];	//White all pieces!
-	boards[13] = boards[6] | boards[9] | boards[10] | boards[11];	//Black all pieces!
-	PrintGameBoard(boards);
-	GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12], boards);
-	for (int i = 0; i < 256; i++)
-	{
-		if (moves[i] == 0)
-		{
-			printf("%d\n", i);
-			break ;
-		}
-	}
+bool EnPassantTest(uint64_t *boards)
+{
+	boards[0] = (1ull << 24);
+	boards[1] = 0;
+	boards[2] = 0;
+	boards[3] = 0;
+	boards[4] = 0;
+	boards[5] = (1ull << 63);
+	boards[6] = (1ull << 25);
+	boards[7] = 0;
+	boards[8] = 0;
+	boards[9] = 0;
+	boards[10] = 0;
+	boards[11] = (1ull << 7);
+	boards[12] = boards[0] | boards[5];
+	boards[13] = boards[6] | boards[11];
+	SetEnPassantSquare(17);
+	return (true);
+}
+
+bool EnPassantTestBlack(uint64_t *boards)
+{
+	boards[0] = (1ull << 32);
+	boards[1] = 0;
+	boards[2] = 0;
+	boards[3] = 0;
+	boards[4] = 0;
+	boards[5] = (1ull << 63);
+	boards[6] = (1ull << 33);
+	boards[7] = 0;
+	boards[8] = 0;
+	boards[9] = 0;
+	boards[10] = 0;
+	boards[11] = (1ull << 7);
+	boards[12] = boards[0] | boards[5];
+	boards[13] = boards[6] | boards[11];
+	SetEnPassantSquare(40);
+	return (false);
 }

@@ -27,10 +27,10 @@ const uint8_t bQueenSide = 8;
 
 static uint32_t PackMove(uint8_t start, uint8_t end, uint8_t pieceType, uint8_t fullBoardIndex, uint8_t endType)
 {
-	return (uint32_t)start | 
-			((uint32_t)end << 8) | 
-			((uint32_t)pieceType << 16) | 
-			((uint32_t)endType << 20) | 
+	return (uint32_t)start |
+			((uint32_t)end << 8) |
+			((uint32_t)pieceType << 16) |
+			((uint32_t)endType << 20) |
 			((uint32_t)fullBoardIndex << 24);
 }
 
@@ -54,6 +54,8 @@ void UnCastleTheKing(uint64_t *boards, uint8_t parameter)
 		boards[5] &= ~(1ull << 62);
 		boards[3] |= (1ull << 63);
 		boards[3] &= ~(1ull << 61);
+		boards[12] |= ((1ull << 60) | (1ull << 63));
+		boards[12] &= ~(1ull << 62) | (1ull << 61);
 	}
 	else if (parameter == 101)
 	{
@@ -61,6 +63,8 @@ void UnCastleTheKing(uint64_t *boards, uint8_t parameter)
 		boards[5] &= ~(1ull << 58);
 		boards[3] |= (1ull << 56);
 		boards[3] &= ~(1ull << 59);
+		boards[12] |= ((1ull << 60) | (1ull << 56));
+		boards[12] &= ~(1ull << 58) | (1ull << 59);
 	}
 	else if (parameter == 102)
 	{
@@ -68,6 +72,8 @@ void UnCastleTheKing(uint64_t *boards, uint8_t parameter)
 		boards[11] &= ~(1ull << 6);
 		boards[9] |= (1ull << 7);
 		boards[9] &= ~(1ull << 5);
+		boards[13] |= ((1ull << 4) | (1ull << 7));
+		boards[13] &= ~(1ull << 6) | (1ull << 5);
 	}
 	else
 	{
@@ -75,6 +81,8 @@ void UnCastleTheKing(uint64_t *boards, uint8_t parameter)
 		boards[11] &= ~(1ull << 2);
 		boards[9] |= (1ull);
 		boards[9] &= ~(1ull << 3);
+		boards[13] |= ((1ull << 4) | (1ull));
+		boards[13] &= ~(1ull << 2) | (1ull << 3);
 	}
 }
 
@@ -86,6 +94,8 @@ void CastleTheKing(uint64_t *boards, uint8_t parameter, uint8_t *oldRights)
 		boards[5] |= (1ull << 62);
 		boards[3] &= ~(1ull << 63);
 		boards[3] |= (1ull << 61);
+		boards[12] &= ~((1ull << 60) | (1ull << 63));
+		boards[12] |= (1ull << 62) | (1ull << 61);
 		*oldRights = castleRights;
 		castleRights &= 12;
 	}
@@ -95,6 +105,8 @@ void CastleTheKing(uint64_t *boards, uint8_t parameter, uint8_t *oldRights)
 		boards[5] |= (1ull << 58);
 		boards[3] &= ~(1ull << 56);
 		boards[3] |= (1ull << 59);
+		boards[12] &= ~((1ull << 60) | (1ull << 56));
+		boards[12] |= (1ull << 58) | (1ull << 59);
 		*oldRights = castleRights;
 		castleRights &= 12;
 	}
@@ -104,6 +116,8 @@ void CastleTheKing(uint64_t *boards, uint8_t parameter, uint8_t *oldRights)
 		boards[11] |= (1ull << 6);
 		boards[9] &= ~(1ull << 7);
 		boards[9] |= (1ull << 5);
+		boards[13] &= ~((1ull << 4) | (1ull << 7));
+		boards[13] |= (1ull << 6) | (1ull << 5);
 		*oldRights = castleRights;
 		castleRights &= 3;
 	}
@@ -113,6 +127,8 @@ void CastleTheKing(uint64_t *boards, uint8_t parameter, uint8_t *oldRights)
 		boards[11] |= (1ull << 2);
 		boards[9] &= ~(1ull);
 		boards[9] |= (1ull << 3);
+		boards[13] &= ~((1ull << 4) | (1ull));
+		boards[13] |= (1ull << 2) | (1ull << 3);
 		*oldRights = castleRights;
 		castleRights &= 3;
 	}
