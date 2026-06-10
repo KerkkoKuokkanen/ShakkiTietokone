@@ -12,6 +12,9 @@
 #define NO_CAPTURE 20
 #define DEPTH 5
 
+#define INF 20000000
+#define MATE_SCORE 10000000
+
 static bool gameOver = false;
 
 bool GetGameOver()
@@ -166,7 +169,7 @@ static uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
 }
 
 //The recursive function itself
-static int AiTurn(uint64_t boards[14], uint8_t depth, int alpha, int beta, bool white)
+int AiTurn(uint64_t boards[14], uint8_t depth, int alpha, int beta, bool white)
 {
 	if (depth == 0 || boards[5] == 0 || boards[11] == 0)
 		return (GetPositionScore(boards));
@@ -175,13 +178,13 @@ static int AiTurn(uint64_t boards[14], uint8_t depth, int alpha, int beta, bool 
 	uint8_t castleRights = 0;
 	if (white)
 	{
-		int maxEval = -9999999;
+		int maxEval = -INF;
 		//Generates all the possible moves
 		uint8_t r = GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], boards[4], boards[5], boards[12], boards[13], boards);
 		if (r == 1)
 			return (0);
 		if (r == 2)
-			return (maxEval - depth * 10);
+			return (-MATE_SCORE - depth * 10);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
@@ -202,12 +205,12 @@ static int AiTurn(uint64_t boards[14], uint8_t depth, int alpha, int beta, bool 
 	}
 	else
 	{
-		int minEval = 9999999;
+		int minEval = INF;
 		uint8_t r = GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], boards[10], boards[11], boards[13], boards[12], boards);
 		if (r == 1)
 			return (0);
 		if (r == 2)
-			return (minEval + depth * 10);
+			return (MATE_SCORE + depth * 10);
 		uint8_t i = 0;
 		while (moves[i] != 0)
 		{
@@ -247,7 +250,7 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 		{
 			int8_t epSquareTemp = GetEnPassantSquare();
 			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
-			int score = AiTurn(boards, DEPTH, -9999999, 9999999, false);
+			int score = AiTurn(boards, DEPTH, -INF, INF, false);
 			UnMakeMove(moves[i], boards, capture, castleRights);
 			SetEnPassantSquare(epSquareTemp);
 
@@ -273,7 +276,7 @@ uint32_t GetMove(uint64_t boards[14], bool white)
 		{
 			int8_t epSquareTemp = GetEnPassantSquare();
 			uint8_t capture = MakeMove(moves[i], boards, &castleRights);
-			int score = AiTurn(boards, DEPTH, -9999999, 9999999, true);
+			int score = AiTurn(boards, DEPTH, -INF, INF, true);
 			UnMakeMove(moves[i], boards, capture, castleRights);
 			SetEnPassantSquare(epSquareTemp);
 

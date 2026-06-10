@@ -41,6 +41,7 @@ static void Init()
 	GenerateSlides();
 	GeneratePawnAttacks();
 }
+
 static uint8_t MakeMove(uint32_t move, uint64_t *boards)
 {
 	uint8_t start = move & 0xFF;
@@ -172,6 +173,8 @@ static void GameLoop(int parameter)
 			break ;
 		}
 		MakeMove(move, boards);
+		for (int i =0; i < 14; i++)
+			printf("%llu\n", boards[i]);
 		PrintGameBoard(boards);
 		white = !white;
 		printf("Press enter to continue\n");

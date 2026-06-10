@@ -18,7 +18,7 @@ static int GetPositionScoreS(uint64_t pawns, uint64_t knights, uint64_t bishops,
 	score += std::popcount(queens) * 900;
 	return (score);
 }
-
+//1120
 
 static int GetPawnCenterBonus(uint64_t pawns)
 {
@@ -51,6 +51,8 @@ static int PiecesActive(uint64_t knigth, uint64_t bishops)
 	return (count * 40);
 }
 
+#include "stdio.h"
+
 //simple board evaluation based on piece values
 int GetPositionScore(uint64_t *boards)
 {
@@ -59,10 +61,10 @@ int GetPositionScore(uint64_t *boards)
 	s1 += GetPawnCenterBonus(boards[0]);
 	s2 += GetPawnCenterBonus(boards[6]);
 	s1 -= GetDoubledPawnMinus(boards[0]);
-	s2 -= GetDoubledPawnMinus(boards[0]);
+	s2 -= GetDoubledPawnMinus(boards[6]);
 	s1 -= GetKnightRimMinus(boards[1]);
 	s2 -= GetKnightRimMinus(boards[7]);
 	s1 -= PiecesActive(boards[1], boards[2]);
-	s2 -= PiecesActive(boards[6], boards[7]);
+	s2 -= PiecesActive(boards[7], boards[8]);
 	return (s1 - s2);
 }

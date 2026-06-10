@@ -1,15 +1,19 @@
 
-Testaus on tehty selvittämään muuutamassa eri tilanteessa jossa on varma shakkimatti kahden tai
-kolmen siirron päässä.
+Testaus on tehty käyttäen yksikkötestejä Catch2 työkalua hyödyntäen
 
-Testejä voi testata antamalla aluksi argumentin ohjelmalle: test1, test2, test3, test4, castle1, castle2, pass, passb
+(linux & mac)
+Saatat joutua lataamaan Catch2 työkalun:
+-> cd tests
+-> curl -L -o catch.hpp https://raw.githubusercontent.com/catchorg/Catch2/v2.x/single_include/catch2/catch.hpp
+	TAI
+-> wget -O catch.hpp https://raw.githubusercontent.com/catchorg/Catch2/v2.x/single_include/catch2/catch.hpp
 
-Tietokone saa pelitilanteen netistä hakemistani eri shakkimatti n siirron päässä tilanteista.
-Olen myös pyrkinyt testeissä painottamaan "hankalia" tilanteita, joissa väärä siirto voi johtaa
-tasapeliin (stalemate) tai että on nappuloita jotka eivät pysty liikkumaan sillä se olisi
-laiton siirto.
+Testit voi juosta käyttämällä: make test
 
-Näillä testeillä pyritään tarkastamaan että tietokone varmasti löytää parhaan mahdollisen shakkimatin
-mahdollisimman nopeasti. Esimekiksi että se tekee shakkimatin kahdella siirrolla jos se on mahdollista eikä kolmella.
-Myös että puolustava pelaaja ei tee laittomia siirtoaj, sekä että tietokone ei hyväksy helppoa tasapeliä voittavassa
-tilanteessa.
+Tämän jälkeen:
+Enemmän tietoa saa kun juoksee: ./test_runner -r compact -s
+Eniten tietoa: ./test_runner -r console -s
+
+Catch2 on erikseen juokseva ohjelma joka suorittaa sille annettuja testejä.
+Virhe tilanteessa chach2 ilmoittaa virheestä, muussa tapauksessa se antaa vihreää
+väriä onnistumisen merkiksi.

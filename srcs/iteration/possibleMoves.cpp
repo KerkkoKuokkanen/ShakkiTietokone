@@ -30,6 +30,7 @@ static void PackPawnMoveBlack(uint32_t *moves, uint8_t *index, uint8_t start, ui
 		moves[*index + 2] = PackMove(start, end, 6, 13, 9);
 		moves[*index + 3] = PackMove(start, end, 6, 13, 10);
 		*index += 4;
+		return ;
 	}
 	moves[*index] = PackMove(start, end, 6, 13, 6);
 	*index += 1;
