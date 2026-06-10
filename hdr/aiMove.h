@@ -14,4 +14,7 @@ uint32_t GetMove(uint64_t boards[14], bool white);
 int AiTurn(uint64_t boards[14], uint8_t depth, int alpha, int beta, bool white);
 bool GetGameOver();
 
+uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights);
+void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture, uint8_t castleRights);
+
 #endif

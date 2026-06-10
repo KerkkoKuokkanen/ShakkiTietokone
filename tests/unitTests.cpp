@@ -64,7 +64,7 @@ static void Init()
 //generate all the required moves for the position
 //I have calculated the amount of possible moves in theese positions
 //We check if the result matches the expected amount of moves
-TEST_CASE("Possible move generation", "[moves]")
+TEST_CASE("Possible move generation", "[generation]")
 {
 	Init();
 	uint32_t moves[256] = {0};
@@ -245,5 +245,143 @@ TEST_CASE("Castling and promotion", "[special]")
 							boards[4], boards[5], boards[12], boards[13], boards);
 		amount = PieceTypeCountHelper(moves, 0);
 		REQUIRE(amount == 4);
+	}
+}
+
+struct BWboard {
+	uint64_t white;
+	uint64_t black;
+};
+
+const static BWboard expectedResultsBlack[] = {{10394344228149788672llu, 1049060llu},
+										 {10394344228149788672llu, 268435940llu},
+										 {10394344228149788672llu, 135648llu},
+										 {10394344228149788672llu, 528864llu},
+										 {10394344228149788672llu, 4326llu},
+										 {10394344228149788672llu, 135396llu},
+										 {10394344228149788672llu, 67113188llu},
+										 {10394344228149788672llu, 34359742692llu},
+										 {10394344228149788672llu, 17592186048740llu},
+										 {10394344228149788672llu, 9007199254745316llu},
+										 {10394344228149788672llu, 4611686018427392228llu},
+										 {10394344228149788672llu, 4556llu},
+										 {10394344228149788672llu, 4564llu},
+										 {10394344228149788672llu, 12740llu},
+										 {10394344228149788672llu, 2101700llu},
+										 {10394344228149788672llu, 536875460llu},
+										 {10394344228149788672llu, 137438958020llu},
+										 {10394309043777699840llu, 35184372093380llu},
+										 {10394344228149788672llu, 12708llu},
+										 {10394344228149788672llu, 20900llu},
+										 {10394344228149788672llu, 37284llu},
+										 {10394344228149788672llu, 1053092llu},
+										 {10394344228149788672llu, 4198820llu},
+										 {10394344228149788672llu, 134222244llu},
+										 {10394344228149788672llu, 1073746340llu},
+										 {10394344228149788672llu, 17179873700llu},
+										 {10394344228149788672llu, 274877911460llu},
+										 {10394344228149788672llu, 2199023260068llu},
+										 {10394344228149788672llu, 70368744182180llu},
+										 {10394344228149788672llu, 281474976715172llu},
+										 {10376329829640306688llu, 18014398509486500llu},
+										 {10394344228149788672llu, 20836llu},
+										 {10394344228149788672llu, 37220llu}};
+
+const static BWboard expectedResultsWhite[] = {{10376330104518213632llu, 4580llu},
+											  {10376400198384484352llu, 4580llu},
+											  {10394344223854952448llu, 4580llu},
+											  {10394344223921930240llu, 4580llu},
+											  {10394348621901332480llu, 4580llu},
+											  {10394907173808242688llu, 4580llu},
+											  {10394343128638164992llu, 484llu},
+											  {10394343128638685184llu, 4580llu},
+											  {10394343128705269760llu, 4580llu},
+											  {10394343137228095488llu, 4580llu},
+											  {10394906078591582208llu, 4580llu},
+											  {10682573504789872640llu, 4580llu},
+											  {10394309043777699872llu, 4548llu},
+											  {10394309043777708032llu, 4580llu},
+											  {10394309043779796992llu, 4580llu},
+											  {10394309044314570752llu, 4580llu},
+											  {10394309181216653312llu, 4580llu},
+											  {10394311242800955392llu, 4580llu},
+											  {10394313441824210944llu, 4580llu},
+											  {10394317839870722048llu, 4580llu},
+											  {10394326635963744256llu, 4580llu},
+											  {10394379412521877504llu, 4580llu},
+											  {10394449781266055168llu, 4580llu},
+											  {10403316243032440832llu, 4580llu},
+											  {12700152052991393792llu, 4580llu},
+											  {9241422723542945792llu, 484llu},
+											  {9241422723543990272llu, 4580llu},
+											  {9241422723559718912llu, 4580llu},
+											  {9241422723811377152llu, 4580llu},
+											  {9241422732132876288llu, 4580llu},
+											  {9241422792262418432llu, 4580llu},
+											  {9241423273298755584llu, 4580llu},
+											  {9241427121589452800llu, 4580llu},
+											  {9241440315728986112llu, 4580llu},
+											  {9241493092287119360llu, 4580llu},
+											  {9243674523356626944llu, 4580llu},
+											  {9245926323170312192llu, 4580llu},
+											  {9250429922797682688llu, 4580llu},
+											  {9313480317580869632llu, 4580llu},
+											  {9385537911618797568llu, 4580llu},
+											  {9529653099694653440llu, 4580llu},
+											  {9817883475846365184llu, 4580llu},
+											  {11547265732756635648llu, 4580llu},
+											  {13853108741970329600llu, 4580llu},
+											  {1207000988313976832llu, 4580llu}};
+
+//This test block tests the MakeMove and UnmakeMove functions
+//We have a board with all types of pieces and we test that the
+//Bitboard maps correspond to the expected ones when we make a move
+TEST_CASE("making moves", "[moves]")
+{
+	Init();
+	uint64_t boards[14] = {0};
+	uint32_t moves[256] = {0};
+
+	MoveGenerationTest(boards);
+	SECTION("Black all moves")
+	{
+		GenerateMovesBlack(moves, boards[6], boards[7], boards[8], boards[9], 
+								boards[10], boards[11], boards[13], boards[12], boards);
+		uint8_t castleRighs = 0;
+		for (int i = 0; i < 255; i++)
+		{
+			if (moves[i] == 0)
+				break ;
+
+			uint64_t board1 = boards[12];
+			uint64_t board2 = boards[13];
+			uint8_t ret = MakeMove(moves[i], boards, &castleRighs);
+			REQUIRE(expectedResultsBlack[i].white == boards[12]);
+			REQUIRE(expectedResultsBlack[i].black == boards[13]);
+			UnMakeMove(moves[i], boards, ret, castleRighs);
+			REQUIRE(board1 == boards[12]);
+			REQUIRE(board2 == boards[13]);
+		}
+	}
+	MoveGenerationTest(boards);
+	SECTION("White all moves")
+	{
+		GenerateMovesWhite(moves, boards[0], boards[1], boards[2], boards[3], 
+							boards[4], boards[5], boards[12], boards[13], boards);
+		uint8_t castleRighs = 0;
+		for (int i = 0; i < 255; i++)
+		{
+			if (moves[i] == 0)
+				break ;
+
+			uint64_t board1 = boards[12];
+			uint64_t board2 = boards[13];
+			uint8_t ret = MakeMove(moves[i], boards, &castleRighs);
+			REQUIRE(expectedResultsWhite[i].white == boards[12]);
+			REQUIRE(expectedResultsWhite[i].black == boards[13]);
+			UnMakeMove(moves[i], boards, ret, castleRighs);
+			REQUIRE(board1 == boards[12]);
+			REQUIRE(board2 == boards[13]);
+		}
 	}
 }

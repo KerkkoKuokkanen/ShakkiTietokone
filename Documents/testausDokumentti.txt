@@ -18,6 +18,6 @@ Catch2 on erikseen juokseva ohjelma joka suorittaa sille annettuja testejä.
 Virhe tilanteessa chach2 ilmoittaa virheestä, muussa tapauksessa se antaa vihreää
 väriä onnistumisen merkiksi.
 
-Testitapauksia on yhteensä 40 ja ne pyrkivät testaamaan ohjelmaa mahdollisimman monipuolisesti
+Testit pyrkivät testaamaan ohjelmaa mahdollisimman monipuolisesti
 Kansiosta tests joka on srcs:n ulkopuolella löytyy tiedosto "unitTests.cpp" josta kaikki testit löytyvät
 Tiedostossa on myös selitetty jokaisen testin hieman yksityiskohtaisemmat piirteet

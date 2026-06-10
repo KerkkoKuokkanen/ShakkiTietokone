@@ -23,7 +23,7 @@ bool GetGameOver()
 }
 
 //Unmakes the already made move so that the board stays clean and usable
-static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture, uint8_t castleRights)
+void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture, uint8_t castleRights)
 {
 	uint8_t start = move & 0xFF;
 	if (start >= 100)
@@ -76,7 +76,7 @@ static void UnMakeMove(uint32_t move, uint64_t *boards, uint8_t capture, uint8_t
 }
 
 //Unpacks the move from the 32 bit integer and makes it
-static uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
+uint8_t MakeMove(uint32_t move, uint64_t *boards, uint8_t *castleRights)
 {
 	uint8_t start = move & 0xFF;
 	if (start >= 100)
