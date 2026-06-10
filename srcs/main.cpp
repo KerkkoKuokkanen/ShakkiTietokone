@@ -173,8 +173,6 @@ static void GameLoop(int parameter)
 			break ;
 		}
 		MakeMove(move, boards);
-		for (int i =0; i < 14; i++)
-			printf("%llu\n", boards[i]);
 		PrintGameBoard(boards);
 		white = !white;
 		printf("Press enter to continue\n");
