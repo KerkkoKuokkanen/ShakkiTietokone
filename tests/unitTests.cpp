@@ -64,6 +64,7 @@ static void Init()
 //generate all the required moves for the position
 //I have calculated the amount of possible moves in theese positions
 //We check if the result matches the expected amount of moves
+//Many of theese positions include checked squares and pinned pieces
 TEST_CASE("Possible move generation", "[generation]")
 {
 	Init();
